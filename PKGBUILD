@@ -11,7 +11,7 @@
 # Contributor: John Luebs <jkluebs@gmail.com>
 
 pkgname=('go' 'go-tools')
-pkgver=1.6.3
+pkgver=1.7.3
 pkgrel=1
 epoch=2
 arch=('x86_64' 'i686')
@@ -19,14 +19,14 @@ url='http://golang.org/'
 license=('BSD')
 makedepends=('inetutils' 'git' 'go')
 options=('!strip' 'staticlibs')
-source=("$pkgname-$pkgver.tar.gz::https://github.com/golang/go/archive/${pkgname}${pkgver}.tar.gz")
-md5sums=('c8f348c6d5bc305618337e941f261399')
+source=("$pkgname-$pkgver::git+https://go.googlesource.com/go#tag=$pkgname$pkgver")
+md5sums=('SKIP')
 _gourl=golang.org/x/tools/cmd
 
 build() {
-  cd "$pkgname-${pkgname}${pkgver}/src"
+  cd "$pkgname-$pkgver/src"
 
-  export GOROOT="$srcdir/$pkgname-${pkgname}$pkgver"
+  export GOROOT="$srcdir/$pkgname-$pkgver"
   export GOBIN="$GOROOT/bin"
   export GOPATH="$srcdir/"
   export GOROOT_FINAL=/usr/lib/go
@@ -75,7 +75,7 @@ build() {
   done
 
   # Distribution tools
-  for tool in benchcmp bundle callgraph digraph eg fiximports guru html2article oracle present ssadump stress stringer ; do
+  for tool in benchcmp bundle callgraph digraph eg fiximports guru html2article present ssadump stress stringer ; do
     $GOROOT/bin/go get -d golang.org/x/tools/cmd/$tool
     $GOROOT/bin/go build -v -x -o $GOPATH/pkg/tool/${GOOS}_$GOARCH/$tool golang.org/x/tools/cmd/$tool
   done
@@ -97,8 +97,8 @@ check() {
   export PATH="$srcdir/$pkgname-$pkgver/bin:$PATH"
   export GOROOT_BOOTSTRAP=/usr/lib/go
 
-  for tool in godoc goimports gomvpkg gorename gotype \
-    benchcmp bundle callgraph digraph eg fiximports guru html2article oracle present ssadump stress stringer; do
+  for tool in goimports gomvpkg gorename gotype \
+    benchcmp bundle callgraph digraph eg fiximports guru html2article present ssadump stress stringer; do
     GOPATH="$srcdir" $GOROOT/bin/go test -v -x $_gourl/$tool
   done
 
@@ -112,7 +112,7 @@ package_go() {
               'git: for fetching sources from git repositories'
               'bzr: for fetching sources from bazaar repositories'
               'subversion: for fetching sources from subversion repositories'
-              'go-tools: godoc, goimports, gorename, and other tools.')
+              'go-tools: doc, goimports, gorename, and other tools.')
   install="$pkgname.install"
 
   cd "$pkgname-$pkgver"
@@ -145,7 +145,7 @@ package_go() {
 
   install -Dm644 VERSION "$pkgdir/usr/lib/go/VERSION"
 
-  # For godoc
+  # For godoc command
   install -Dm644 favicon.ico "$pkgdir/usr/lib/go/favicon.ico"
 
   # Clean Windows specific files.
